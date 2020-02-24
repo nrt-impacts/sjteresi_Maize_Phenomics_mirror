@@ -1,0 +1,37 @@
+point_data_6in_2019obs.csv
+
+This file contains all dates for 2019. One grid of points spaced every 6" was created and used to extract
+RGB and Z values from all dates. This gives a population of ~140 points per plot (but this may or may not
+be exactly the same number per plot due to the geometries...I can explain this later with a visual). 
+The point spacing is exactly equal, the plot areas are exactly equal to each other, and the point grid is the
+exact same from date to date. This means that you can track a single point through all timepoints.
+
+The Z values were extracted from a Digital Surface Model (DSM). You can imagine this as a blanket
+draped over the whole field surface, values from which are then resampled at each of the points in the grid.
+This is NOT filtered for greenness (plant vs ground), and it is NOT corrected for ground height (i.e., all 
+values are in feet above sea level, not feet above the ground). This is significant because if you use the 
+numbers as-is, there is about a 5-foot drop from the west to east end of the field (over about 100 feet of 
+distance). A 5% slope is considered fairly negligible as farmland goes, but would completely swamp out 
+differences in plant height. I attempted the effort of green-filtering and/or creating a Digital Terrain
+Model (DTM, land only with no cover) in order to get you the Canopy Height Model (height of plants from the
+ground), but could not get this far. You could take this approach, or it would be faster and potentially more
+accurate to just take some measure of the minimum value(s) for each plot on the earliest date, then use that 
+as "ground" for that plot. If you don't understand the differences between the DSM/DTM/Canopy, please see 
+this picture:
+https://i.stack.imgur.com/1l3EA.png
+
+If you do not like the DSM approach, I also have the .las files that have raw xyz values for EVERY 
+measured point in the original datasets that were used to generate the DSMs. I do not have much capability
+to handle/process this quickly, but if you want to approach that you may ask for those (large) files. Similarly, 
+I have the orthophotos (tif images with stitched RGB pixels). I would advise to use the DSM approach because 
+you should find it to be less initial work to get to the modeling parts you actually want to do. If you are
+concerned about the 6" sampling distance, this was done for feasibility of dataset size. If you have a compelling
+reason, I can resample at a finer scale once you have a pipeline ready. Remember though that sampling at 6" from
+a 2cm resolution image does not change your resolution to 6"...you still use/gain info from having a fine-scale
+resolution from which to sample. So the question isn't whether 6" is a small enough number in itself, but in whether
+you feel the 140 or so points you are using per plot adequately represent the population of heights for that plot.
+
+For the x and y positions of the evenly distributed grid of points, the Coordinate Reference System used was:
+NAD_1983_2011_StatePlane_Michigan_South_FIPS_2113_Ft_Intl
+You may well not need this information for your work, but I wanted you to have it just in case. If you need it
+converted to some other coordinate system for some reason I can help with this.

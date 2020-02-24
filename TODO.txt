@@ -1,0 +1,10 @@
+# Group, TODO 2020 02 24
+- [ ] Read DataSummary.txt which was given to us as a README.txt
+- [ ] Import the image data into Pandas
+     - RGB values may be discarded, only keep DSM (height) columns
+     - Discuss dropping X and Y
+     - Fill missing DSM values with NA
+     - Remove "Fill" rows
+     - Remove the last two sequences of numbers, which signify Range and Pass from the Plot ID
+- [ ] Import the hand-measurements into Pandas
+     - Keep P1 and P2 height and average into one column
