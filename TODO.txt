@@ -8,3 +8,7 @@
      - Remove the last two sequences of numbers, which signify Range and Pass from the Plot ID
 - [ ] Import the hand-measurements into Pandas
      - Keep P1 and P2 height and average into one column
+- [ ] Discuss whether the RNN will be used vs a more classical model
+     - Random forest
+     - SVM
+- [ ] Scott: Connect genotypes to PlotID from obs_2019_key in LeafAreaFromDrones folder
