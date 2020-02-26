@@ -9,6 +9,7 @@ import coloredlogs
 from configparser import ConfigParser
 
 from load_data.import_image_data import image_data
+from load_data.import_ground_data import ground_data
 
 if __name__ == '__main__':
     # TODO implement a main description
@@ -38,3 +39,6 @@ if __name__ == '__main__':
 
     logger.info("Load and clean the data...")
     DroneData = image_data(DroneData)
+
+    logger.info('Importing the ground data...')
+    HumanData = ground_data(HumanData)
