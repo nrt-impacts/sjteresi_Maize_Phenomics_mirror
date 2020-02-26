@@ -36,3 +36,5 @@ def image_data(file_name):
     image_data.plot_id = image_data.plot_id.str[:9]  # TODO Confirm with robert
     # one more time that we can indeed cut the first 9 out and we won't mess up
     # any names.
+
+    return image_data
