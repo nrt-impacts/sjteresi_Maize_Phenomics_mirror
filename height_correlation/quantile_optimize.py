@@ -1,10 +1,10 @@
 # Import modules
 import numpy
 import pyswarms
-from .objective_funtion import htcor_objfn
+from .objective_function import htcor_objfn
 
 def quantile_optimize(z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht,
-    c1 = 0.5, c2 = 0.3, w = 0.9):
+    c1 = 0.5, c2 = 0.3, w = 0.9, n_particles = 100, iters = 20):
     """
     Optimize quantiles
 
@@ -65,7 +65,7 @@ def quantile_optimize(z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht,
 
     # create optimizer object
     optimizer = pyswarms.single.GlobalBestPSO(
-        n_particles = 10,
+        n_particles = n_particles,
         dimensions = 2,
         options = options,
         bounds = bounds
@@ -74,7 +74,7 @@ def quantile_optimize(z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht,
     # Perform optimization
     cost, pos = optimizer.optimize(
         htcor_objfn,
-        iters=1000,
+        iters = iters,
         **kwargs
     )
 
