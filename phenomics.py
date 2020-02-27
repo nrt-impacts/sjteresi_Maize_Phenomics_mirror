@@ -9,7 +9,8 @@ import coloredlogs
 from configparser import ConfigParser
 
 from load_data.import_image_data import image_data, extract_dsm
-from load_data.import_ground_data import ground_data
+from load_data.import_ground_data import ground_data, extract_canopy_ht
+from height_correlation.quantile_optimize import quantile_optimize
 
 if __name__ == '__main__':
     # TODO implement a main description
@@ -41,17 +42,39 @@ if __name__ == '__main__':
     DroneData = image_data(DroneData)
 
     logger.info('Importing the ground data...')
-    #HumanData = ground_data(HumanData)
+    HumanData = ground_data(HumanData)
 
     # extract data from columns for soil
     soil, soil_size = extract_dsm(
         DroneData,
         colname = "DSM_7_2_19",
-        groupcol = "plot_id"
+        groupcol = "plot_id",
+        grouprow = HumanData["plot"].values
     )
     # extract data from columns for canopy
     canopy, canopy_size = extract_dsm(
         DroneData,
         colname = "DSM_10_7_19", # this is the last date (caution: dead plants?)
-        groupcol = "plot_id"
+        groupcol = "plot_id",
+        grouprow = HumanData["plot"].values
     )
+
+    # extract canopy manually taken heights from pandas.DataFrame
+    manual_ht = extract_canopy_ht(
+        HumanData
+    )
+
+    # identify optimal quantile settings
+    cost, pos = quantile_optimize(
+        z_soil = soil,
+        z_soil_size = soil_size,
+        z_canopy = canopy,
+        z_canopy_size = canopy_size,
+        manual_ht = manual_ht,
+        n_particles = 100,
+        iters = 20
+    )
+
+    print("Objfn cost:", cost)
+    print("Soil quantile:", pos[0])
+    print("Canopy quantile:", pos[1])
