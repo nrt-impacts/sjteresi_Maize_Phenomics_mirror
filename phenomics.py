@@ -8,7 +8,7 @@ import logging
 import coloredlogs
 from configparser import ConfigParser
 
-from load_data.import_image_data import image_data
+from load_data.import_image_data import image_data, extract_dsm
 from load_data.import_ground_data import ground_data
 
 if __name__ == '__main__':
@@ -41,4 +41,17 @@ if __name__ == '__main__':
     DroneData = image_data(DroneData)
 
     logger.info('Importing the ground data...')
-    HumanData = ground_data(HumanData)
+    #HumanData = ground_data(HumanData)
+
+    # extract data from columns for soil
+    soil, soil_size = extract_dsm(
+        DroneData,
+        colname = "DSM_7_2_19",
+        groupcol = "plot_id"
+    )
+    # extract data from columns for canopy
+    canopy, canopy_size = extract_dsm(
+        DroneData,
+        colname = "DSM_10_7_19", # this is the last date (caution: dead plants?)
+        groupcol = "plot_id"
+    )

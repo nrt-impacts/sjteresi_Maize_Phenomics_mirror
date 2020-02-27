@@ -18,7 +18,7 @@ def ground_data(file_name):
             header='infer')
 
     # Keep the plot, PlantHeightP1, and PlantHeightP2 columns only.
-    ground_data = ground_data.loc['plot','PlantHeightP1','PlantHeightP2',axis=1]
+    #ground_data = ground_data.loc['plot','PlantHeightP1','PlantHeightP2',axis=1]
     #ground_data.head()
 
     return ground_data
