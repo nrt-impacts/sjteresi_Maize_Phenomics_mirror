@@ -8,8 +8,13 @@ min_bound = numpy.array([0.0, 0.0])
 max_bound = numpy.array([1.0, 1.0])
 bounds = (min_bound, max_bound)
 
-# Initialize swarm
-options = {
+# swarm parameters
+options = {     # swarm inertial coefficients
+    'c1': 0.5,
+    'c2': 0.3,
+    'w':0.9
+}
+kwargs = {  # arguments to pass to objective function
     "z_soil"        : z_soil,
     "z_soil_size"   : z_soil_size,
     "z_canopy"      : z_canopy,
@@ -26,4 +31,8 @@ optimizer = pyswarms.single.GlobalBestPSO(
 )
 
 # Perform optimization
-cost, pos = optimizer.optimize(htcor_objfn, iters=1000)
+cost, pos = optimizer.optimize(
+    htcor_objfn,
+    iters=1000,
+    **kwargs
+)
