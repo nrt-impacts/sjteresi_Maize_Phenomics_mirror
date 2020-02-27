@@ -43,11 +43,11 @@ def htcor_objfn(x, z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht):
     """
     # allocate empty arrays for soil height and canopy height.
     soil_ht = numpy.empty(
-        shape = len(manual_ht),
+        shape = (len(x),len(manual_ht)),
         dtype = 'float64'
     )
     canopy_ht = numpy.empty(
-        shape = len(manual_ht),
+        shape = (len(x),len(manual_ht)),
         dtype = 'float64'
     )
 
@@ -57,15 +57,18 @@ def htcor_objfn(x, z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht):
 
     # calculate quantile values
     for i,(st,sp) in enumerate(zip(soil_stop - z_soil_size, soil_stop)):
-        soil_ht[i] = numpy.quantile(z_soil[st:sp], x[:,0])
-    for i,(st,sp) in enumerate(zip(canopy_stop - z_canopy, canopy_stop)):
-        canopy_ht[i] = numpy.quantile(z_canopy[st:sp], x[:,1])
+        soil_ht[:,i] = numpy.quantile(z_soil[st:sp], x[:,0])
+    for i,(st,sp) in enumerate(zip(canopy_stop - z_canopy_size, canopy_stop)):
+        canopy_ht[:,i] = numpy.quantile(z_canopy[st:sp], x[:,1])
 
     # calculate estimated heights
     est_ht = canopy_ht - soil_ht
 
     # calculate Pearson correlation coefficient
-    r = numpy.corrcoef(est_ht, manual_ht)[0,1]
+    r = numpy.fromiter(
+        (numpy.corrcoef(est_ht[r,:],manual_ht)[0,1] for r in range(len(est_ht))),
+        dtype = 'float64'
+    )
 
-    # return negative Pearson correlation coefficient
+    # return negative Pearson correlation coefficient, since we want to minimize
     return -1.0 * r
