@@ -42,13 +42,17 @@ def image_data(file_name, sortcol = "plot_id"):
 
     return image_data
 
-def extract_dsm(df, colname, groupcol="plot_id"):
+def extract_dsm(df, colname, groupcol="plot_id", grouprow=None):
     """
     Extract column from pandas.DataFrame. Spit out column values without NA
     and a groupings array. Assumes sorted pandas.DataFrame
     """
     # grab column values
-    sub_df = df.loc[:,[groupcol,colname]]
+    sub_df = None
+    if grouprow is None:
+        sub_df = df.loc[:,[groupcol,colname]]
+    else:
+        sub_df = df.loc[df[groupcol].isin(grouprow),[groupcol,colname]]
 
     # make NA mask
     mask_NA = sub_df[colname].isna()
