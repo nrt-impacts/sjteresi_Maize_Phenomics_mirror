@@ -12,4 +12,4 @@
 - [ ] Discuss whether the RNN will be used vs a more classical model
      - Random forest
      - SVM
-- [ ] Scott: Connect genotypes to PlotID from obs_2019_key in LeafAreaFromDrones folder
+- [ ] Anna: Connect genotypes to PlotID from obs_2019_key in LeafAreaFromDrones folder

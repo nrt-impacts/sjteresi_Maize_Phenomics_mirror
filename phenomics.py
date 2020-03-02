@@ -10,6 +10,7 @@ from configparser import ConfigParser
 
 from load_data.import_image_data import image_data
 from load_data.import_ground_data import ground_data
+from load_data.import_obs_data import obs_data
 
 if __name__ == '__main__':
     # TODO implement a main description
@@ -42,3 +43,6 @@ if __name__ == '__main__':
 
     logger.info('Importing the ground data...')
     HumanData = ground_data(HumanData)
+
+    logger.info('Importing the ground data...')
+    ObsData = obs_data(ObservationKey)
