@@ -14,9 +14,9 @@ def ground_data(file_name, sortcol = "plot"):
     """
     # read data into pandas.DataFrame
     ground_data = pd.read_csv(
-        file_name,
-        sep=',',
-        header='infer'
+            file_name,
+            sep=',',
+            header='infer'
     )
 
     # Keep the plot, PlantHeightP1, and PlantHeightP2 columns only.
@@ -27,12 +27,12 @@ def ground_data(file_name, sortcol = "plot"):
     # remove NaN values
     ground_data = ground_data.loc[~ground_data['MeanPHeight'].isna(),:]
 
-    # sort data by plot_id
+    # sort by plot_id
     ground_data = ground_data.sort_values(by=sortcol)
 
     return ground_data
 
-def extract_canopy_ht(df, colname = "MeanPHeight"):
+def extract_canopy_ht(df, colname = 'MeanPHeight'):
     """
     extract canopy heights
     Assumes a pandas.DataFrame sorted by "plot"
