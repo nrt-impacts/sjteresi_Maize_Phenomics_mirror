@@ -2,3 +2,4 @@
 # You can use this by pip install -r requirements/common.txt
 pandas==0.25.0
 coloredlogs==10.0
+pyswarms==1.1.0

@@ -7,7 +7,7 @@
      - Remove "Fill" rows
      - Remove the last two sequences of numbers, which signify Range and Pass from the Plot ID
 - [ ] Clear TODO inside import_image_data with Robert
-- [ ] Import the hand-measurements into Pandas
+- [X] Import the hand-measurements into Pandas
      - Keep P1 and P2 height and average into one column
 - [ ] Discuss whether the RNN will be used vs a more classical model
      - Random forest

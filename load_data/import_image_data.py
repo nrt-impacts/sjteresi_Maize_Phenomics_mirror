@@ -8,9 +8,10 @@ that data.
 """
 
 import pandas as pd
+import numpy
 
 
-def image_data(file_name):
+def image_data(file_name, sortcol = "plot_id"):
     """ Import the point_data_6in_2019.obs.csv data
 
     Args:
@@ -37,4 +38,39 @@ def image_data(file_name):
     # one more time that we can indeed cut the first 9 out and we won't mess up
     # any names.
 
+    image_data = image_data.sort_values(by=sortcol)
+
     return image_data
+
+def extract_dsm(df, colname, groupcol="plot_id", grouprow=None):
+    """
+    Extract column from pandas.DataFrame. Spit out column values without NA
+    and a groupings array. Assumes sorted pandas.DataFrame
+    """
+    # grab column values
+    sub_df = None
+    if grouprow is None:
+        sub_df = df.loc[:,[groupcol,colname]]
+    else:
+        sub_df = df.loc[df[groupcol].isin(grouprow),[groupcol,colname]]
+
+    # make NA mask
+    mask_NA = sub_df[colname].isna()
+
+    # remove masked things
+    sub_df = sub_df.loc[~mask_NA,[groupcol,colname]]
+
+    # group columns by 'groupby'
+    groups = sub_df.groupby(groupcol)
+
+    # get sizes of each group
+    col_size = numpy.fromiter(
+        (len(group) for name,group in groups),
+        dtype='int64'
+    )
+
+    # get values
+    col = sub_df.loc[:,colname].values
+
+    # return tuple of values
+    return col, col_size
