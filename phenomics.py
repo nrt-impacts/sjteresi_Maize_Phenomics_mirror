@@ -11,6 +11,8 @@ from configparser import ConfigParser
 from load_data.import_image_data import image_data
 from load_data.import_ground_data import ground_data
 from load_data.import_obs_data import obs_data
+from load_data.import_obs_data import geno_plot_dict
+from replace_names import replace_names
 
 if __name__ == '__main__':
     # TODO implement a main description
@@ -46,3 +48,12 @@ if __name__ == '__main__':
 
     logger.info('Importing the ground data...')
     ObsData = obs_data(ObservationKey)
+
+    logger.info('Creating plotID vs. genotype dictionary...')
+    GenoPlotDict = geno_plot_dict(ObsData)
+
+    logger.info('Replacing plotID with genotype for HumanData...')
+    ReplacedHumanData = replace_names(HumanData, GenoPlotDict, 'plot')
+
+    logger.info('Replacing plotID with genotype for DroneData...')
+    ReplacedDroneData = replace_names(DroneData, GenoPlotDict, 'plot_id')
