@@ -6,8 +6,6 @@ __author__ = "Anna Haber"
 This code serves to replace plotID with genotype in a column of a pandas.DataFrame.
 """
 
-import pandas
-
 
 def replace_names(df, dictionary, colreplace):
     """ Replace the plotID with genotype and append as a column.

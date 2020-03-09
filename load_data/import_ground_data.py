@@ -5,7 +5,7 @@ __author__ = "Anna Haber"
 import pandas as pd
 
 
-def ground_data(file_name, sortcol = "plot"):
+def ground_data(file_name, sortcol="plot"):
     """ Import the ground_data_2019.csv data
 
     Args:
@@ -24,19 +24,19 @@ def ground_data(file_name, sortcol = "plot"):
                                               'PlantHeightP2']].mean(axis=1)
 
     # remove NaN values
-    ground_data = ground_data.loc[~ground_data['MeanPHeight'].isna(),:]
-
+    ground_data = ground_data.loc[~ground_data['MeanPHeight'].isna(), :]
     # sort by plot_id
     ground_data = ground_data.sort_values(by=sortcol)
     return ground_data
 
-def extract_canopy_ht(df, colname = 'MeanPHeight'):
+
+def extract_canopy_ht(df, colname='MeanPHeight'):
     """
     extract canopy heights
     Assumes a pandas.DataFrame sorted by "plot"
     """
     # extract numpy.ndarray copy
-    canopy_ht = df.loc[:,colname].values.copy()
+    canopy_ht = df.loc[:, colname].values.copy()
 
     # return numpy.ndarray
     return canopy_ht

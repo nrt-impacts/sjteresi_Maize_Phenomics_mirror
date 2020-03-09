@@ -3,8 +3,9 @@ import numpy
 import pyswarms
 from .objective_function import htcor_objfn
 
+
 def quantile_optimize(z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht,
-    c1 = 0.5, c2 = 0.3, w = 0.9, n_particles = 100, iters = 20):
+                      c1=0.5, c2=0.3, w=0.9, n_particles=100, iters=20):
     """
     Optimize quantiles
 
@@ -51,30 +52,30 @@ def quantile_optimize(z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht,
 
     # swarm parameters
     options = {     # swarm inertial coefficients
-        'c1' : c1,
-        'c2' : c2,
-        'w' : w
+        'c1': c1,
+        'c2': c2,
+        'w': w
     }
     kwargs = {      # arguments to pass to objective function
-        "z_soil"        : z_soil,
-        "z_soil_size"   : z_soil_size,
-        "z_canopy"      : z_canopy,
-        "z_canopy_size" : z_canopy_size,
-        "manual_ht"     : manual_ht
+        "z_soil": z_soil,
+        "z_soil_size": z_soil_size,
+        "z_canopy": z_canopy,
+        "z_canopy_size": z_canopy_size,
+        "manual_ht": manual_ht
     }
 
     # create optimizer object
     optimizer = pyswarms.single.GlobalBestPSO(
-        n_particles = n_particles,
-        dimensions = 2,
-        options = options,
-        bounds = bounds
+        n_particles=n_particles,
+        dimensions=2,
+        options=options,
+        bounds=bounds
     )
 
     # Perform optimization
     cost, pos = optimizer.optimize(
         htcor_objfn,
-        iters = iters,
+        iters=iters,
         **kwargs
     )
 
