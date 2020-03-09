@@ -1,5 +1,40 @@
 import numpy
 
+def get_quantile(q, height, height_size):
+    """
+    Retrieve a height vector.
+
+    Parameters
+    ----------
+    q : numpy.ndarray, list-like, float
+        An array, list, or float of quantiles to grab.
+    height : numpy.ndarray
+        A vector of heights. This vector is mixed for each plot. The number of
+        data points per plot is not equal across all plots (due to NAs). The
+        'height_size' vector denoting the sizes of these chunks.
+    height_size : numpy.ndarray
+        A vector of sizes of data chunks in 'height'.
+
+    Returns
+    -------
+    ht : numpy.ndarray
+        An array of heights at the specified quantiles.
+    """
+    # allocate empty array
+    ht = numpy.empty((len(height_size), len(q)), dtype = 'float64')
+
+    # get start, stop indices
+    height_stop = height_size.cumsum()
+    height_start = height_stop - height_size
+
+    # for each group, get quantile
+    for i,(st,sp) in enumerate(zip(height_start, height_stop)):
+        ht[i,:] = numpy.quantile(height[st:sp], q)
+
+    # return height
+    return ht
+
+
 def htcor_objfn(x, z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht):
     """
     Height correlation objective function. The goal is to minimize this
