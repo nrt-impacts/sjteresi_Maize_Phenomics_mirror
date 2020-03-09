@@ -10,14 +10,11 @@ from configparser import ConfigParser
 
 from pyswarms.utils.plotters import plot_cost_history
 from matplotlib import pyplot
-from pyswarms.utils.plotters.formatters import Mesher
-from pyswarms.utils.plotters import plot_surface
 
 
 from load_data.import_image_data import image_data, extract_dsm
 from load_data.import_ground_data import ground_data, extract_canopy_ht
 from height_correlation.quantile_optimize import quantile_optimize
-from height_correlation.objective_function import htcor_objfn
 from plotting.height_distribution import hist_height
 
 if __name__ == '__main__':
@@ -55,9 +52,9 @@ if __name__ == '__main__':
     # extract data from columns for soil
     soil, soil_size = extract_dsm(
         DroneData,
-        colname = "DSM_7_2_19",
-        groupcol = "plot_id",
-        grouprow = HumanData["plot"].values
+        colname="DSM_7_2_19",
+        groupcol="plot_id",
+        grouprow=HumanData["plot"].values
     )
 
     hist_height(soil, "soil_hist.png")
@@ -65,9 +62,9 @@ if __name__ == '__main__':
     # extract data from columns for canopy
     canopy, canopy_size = extract_dsm(
         DroneData,
-        colname = "DSM_9_2_19", # this is the last date (caution: dead plants?)
-        groupcol = "plot_id",
-        grouprow = HumanData["plot"].values
+        colname="DSM_9_2_19",  # this is the last date (caution: dead plants?)
+        groupcol="plot_id",
+        grouprow=HumanData["plot"].values
     )
 
     hist_height(canopy, "canopy_hist.png")
@@ -79,13 +76,13 @@ if __name__ == '__main__':
 
     # identify optimal quantile settings
     cost, pos, optimizer = quantile_optimize(
-        z_soil = soil,
-        z_soil_size = soil_size,
-        z_canopy = canopy,
-        z_canopy_size = canopy_size,
-        manual_ht = manual_ht,
-        n_particles = 100,
-        iters = 20
+        z_soil=soil,
+        z_soil_size=soil_size,
+        z_canopy=canopy,
+        z_canopy_size=canopy_size,
+        manual_ht=manual_ht,
+        n_particles=100,
+        iters=20
     )
 
     print("Objfn cost:", cost)
