@@ -78,4 +78,4 @@ def quantile_optimize(z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht,
         **kwargs
     )
 
-    return cost, pos
+    return cost, pos, optimizer

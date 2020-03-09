@@ -25,7 +25,7 @@ def ground_data(file_name, sortcol = "plot"):
 
     # remove NaN values
     ground_data = ground_data.loc[~ground_data['MeanPHeight'].isna(),:]
-    
+
     # sort by plot_id
     ground_data = ground_data.sort_values(by=sortcol)
     return ground_data
