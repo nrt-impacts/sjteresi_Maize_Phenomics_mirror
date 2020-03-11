@@ -15,9 +15,9 @@ from configparser import ConfigParser
 from matplotlib import pyplot
 
 from load_data.import_image_data import image_data, extract_dsm
-from ..load_data.import_ground_data import ground_data, extract_canopy_ht
+from load_data.import_ground_data import ground_data, extract_canopy_ht
 #from height_correlation.quantile_optimize import quantile_optimize
-from ..height_correlation.objective_function import htcor_objfn
+from height_correlation.objective_function import htcor_objfn
 #from plotting.height_distribution import hist_height
 
 if __name__ == '__main__':
