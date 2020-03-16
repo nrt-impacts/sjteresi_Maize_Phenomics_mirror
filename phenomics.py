@@ -33,7 +33,13 @@ if __name__ == '__main__':
         'DroneData': 'point_data_6in_2019obs.csv',
         'ObservationKey': 'obs_2019_key.csv',
         'data_07_02': 'MSU_2019_07_02_NatCol_obs_plots.filter.csv',
-        'data_09_02': 'MSU_2019_09_02_NatCol_obs_plots.filter.csv'
+        'data_07_15': 'MSU_2019_07_15_NatCol_obs_plots.filter.csv',
+        'data_07_28': 'MSU_2019_07_28_NatCol_obs_plots.filter.csv',
+        'data_08_12': 'MSU_2019_08_12_NatCol_obs_plots.filter.csv',
+        'data_09_02': 'MSU_2019_09_02_NatCol_obs_plots.filter.csv',
+        'data_09_11': 'MSU_2019_09_11_NatCol_obs_plots.filter.csv',
+        'data_09_24': 'MSU_2019_09_24_NatCol_obs_plots.filter.csv',
+        'data_10_07': 'MSU_2019_10_07_NatCol_obs_plots.filter.csv'
     }
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
@@ -44,7 +50,13 @@ if __name__ == '__main__':
     # Set the objects from the parser
     HumanData = parser.get('Filenames', 'HumanData')
     data_07_02 = parser.get('Filenames', 'data_07_02')
+    data_07_15 = parser.get('Filenames', 'data_07_15')
+    data_07_28 = parser.get('Filenames', 'data_07_28')
+    data_08_12 = parser.get('Filenames', 'data_08_12')
     data_09_02 = parser.get('Filenames', 'data_09_02')
+    data_09_11 = parser.get('Filenames', 'data_09_11')
+    data_09_24 = parser.get('Filenames', 'data_09_24')
+    data_10_07 = parser.get('Filenames', 'data_10_07')
 
     ObservationKey = parser.get('Filenames', 'ObservationKey')
     logger.info("Config file objects have been set...")
