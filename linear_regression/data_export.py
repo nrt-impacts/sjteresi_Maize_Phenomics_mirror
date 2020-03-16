@@ -1,3 +1,4 @@
+
 #Read data
 #Get quantiles in pandas dataframe
 #Take the data and use in r for linear model
@@ -14,11 +15,12 @@ from configparser import ConfigParser
 
 from matplotlib import pyplot
 
-from Maize_Phenomics.load_data.import_image_data import image_data, extract_dsm
-from Maize_Phenomics.load_data.import_ground_data import ground_data, extract_canopy_ht
-#from height_correlation.quantile_optimize import quantile_optimize
-from Maize_Phenomics.height_correlation.objective_function import htcor_objfn
-#from plotting.height_distribution import hist_height
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+from load_data.import_image_data import image_data, extract_dsm
+from load_data.import_ground_data import ground_data, extract_canopy_ht
+from height_correlation.objective_function import htcor_objfn
 
 if __name__ == '__main__':
     # TODO implement a main description
