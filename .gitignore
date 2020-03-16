@@ -6,3 +6,4 @@ load_data/__pycache__/
 Maize_Data/
 *.log
 *.png
+*.csv
