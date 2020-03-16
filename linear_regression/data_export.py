@@ -9,8 +9,9 @@
 __author__ = "McKena Lipham"
 
 import logging
-import pandas
+import pandas as pd
 import coloredlogs
+import numpy as np
 from configparser import ConfigParser
 
 from matplotlib import pyplot
@@ -21,6 +22,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from load_data.import_image_data import image_data, extract_dsm
 from load_data.import_ground_data import ground_data, extract_canopy_ht
 from height_correlation.objective_function import htcor_objfn
+from height_correlation.objective_function import get_quantile
 
 if __name__ == '__main__':
     # TODO implement a main description
@@ -80,12 +82,12 @@ if __name__ == '__main__':
     q = np.linspace(0.0, 1.0, 11)
     
     soil_q = get_quantile(q, soil, soil_size)
-    canopy_q = get_quanitle(q, canopy, canopy_size)
+    canopy_q = get_quantile(q, canopy, canopy_size)
     soil_col = ["s" + str(e) for e in q]
     canopy_col = ["c" + str(e) for e in q]
-    soil_df = pandas.DataFrame(soil_q, columns = soil_col)
-    canopy_df = pandas.DataFrame(canopy_q, columns = canopy_col)
-    manual_df = pandas.DataFrame({"manual": manual_ht})
+    soil_df = pd.DataFrame(soil_q, columns = soil_col)
+    canopy_df = pd.DataFrame(canopy_q, columns = canopy_col)
+    manual_df = pd.DataFrame({"manual": manual_ht})
     export_data = pd.concat([soil_df, canopy_df, manual_df], axis = 1)
     
     export_data.to_csv("quantiles.csv", index = False)
