@@ -65,16 +65,16 @@ def extract_dsm(df, colname, groupcol="plot_id", grouprow=None):
     groups = sub_df.groupby(groupcol)
 
     # get sizes of each group
-    col_size = numpy.fromiter(
-        (len(group) for name, group in groups),
-        dtype='int64'
-    )
+    col_size = numpy.int64([len(group) for name, group in groups])
 
     # get values
     col = sub_df.loc[:, colname].values
 
+    # get column names as object_ array
+    col_name = numpy.object_([name for name, group in groups])
+
     # return tuple of values
-    return col, col_size
+    return col, col_size, col_name
 
 
 def las_outlier_filter(g):
@@ -139,13 +139,13 @@ def las_extract(df, colname, groupcol = "shpID", grouprow = None):
     groups = sub_df.groupby(groupcol)
 
     # get sizes of each group
-    col_size = numpy.fromiter(
-        (len(group) for name, group in groups),
-        dtype='int64'
-    )
+    col_size = numpy.int64([len(group) for name, group in groups])
 
     # get values
     col = sub_df.loc[:, colname].values
 
+    # get column names as object_ array
+    col_name = numpy.object_([name for name, group in groups])
+
     # return tuple of values
-    return col, col_size
+    return col, col_size, col_name
