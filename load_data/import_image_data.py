@@ -65,13 +65,87 @@ def extract_dsm(df, colname, groupcol="plot_id", grouprow=None):
     groups = sub_df.groupby(groupcol)
 
     # get sizes of each group
-    col_size = numpy.fromiter(
-        (len(group) for name, group in groups),
-        dtype='int64'
-    )
+    col_size = numpy.int64([len(group) for name, group in groups])
 
     # get values
     col = sub_df.loc[:, colname].values
 
+    # get column names as object_ array
+    col_name = numpy.object_([name for name, group in groups])
+
     # return tuple of values
-    return col, col_size
+    return col, col_size, col_name
+
+
+def las_outlier_filter(g):
+    q1 = g['z_position'].quantile(0.25)
+    q3 = g['z_position'].quantile(0.75)
+    iqr = q3 - q1
+    llim = q1 - (1.5 * iqr)
+    ulim = q3 + (1.5 * iqr)
+    mask = (g['z_position'] > llim) & (g['z_position'] < ulim) # between llim and ulim
+    return mask
+
+def las_data(file_name, sortcol = "shpID"):
+    """
+    Load file data from LAS CSV.
+
+    file_name : str
+        File name.
+    sortcol : str
+        Name of column to sort by.
+    """
+    # load csv
+    df = pd.read_csv(file_name)
+
+    # sort by sortcol
+    df.sort_values(by = sortcol, inplace = True)
+
+    # Drop the last two sequences of numbers from the shpID column
+    df['shpID'] = df['shpID'].str[:9]
+
+    # filter for outliers : actually makes the prediction worse!
+    # group_list = []
+    # for name, group in df.groupby(sortcol):
+    #     mask = las_outlier_filter(group)
+    #     group_list.append(group[mask])
+    #
+    # out_df = pd.concat(group_list, axis=0)
+
+    return df
+
+def las_extract(df, colname, groupcol = "shpID", grouprow = None):
+    """
+    df : pandas.DataFrame
+        This DataFrame *MUST* be pre-sorted!
+    colname : str
+        Column name to extract.
+    groupcol : str
+        Column name to group by.
+    grouprow : list, array
+        Rows to use (e.g. filtering NA plots)
+    """
+    # make NA mask
+    mask = df[colname].isna()
+
+    # if we are selected specific rows, add grouprow bitwise mask to mask
+    if grouprow is not None:
+        mask = (mask | (~df[groupcol].isin(grouprow)))
+
+    # remove masked things
+    sub_df = df.loc[~mask, [groupcol, colname]]
+
+    # group columns by 'groupby'
+    groups = sub_df.groupby(groupcol)
+
+    # get sizes of each group
+    col_size = numpy.int64([len(group) for name, group in groups])
+
+    # get values
+    col = sub_df.loc[:, colname].values
+
+    # get column names as object_ array
+    col_name = numpy.object_([name for name, group in groups])
+
+    # return tuple of values
+    return col, col_size, col_name

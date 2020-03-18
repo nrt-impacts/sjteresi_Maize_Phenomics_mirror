@@ -12,7 +12,7 @@ from pyswarms.utils.plotters import plot_cost_history
 from matplotlib import pyplot
 
 
-from load_data.import_image_data import image_data, extract_dsm
+from load_data.import_image_data import image_data, las_data, las_extract, extract_dsm
 from load_data.import_ground_data import ground_data, extract_canopy_ht
 from height_correlation.quantile_optimize import quantile_optimize
 from plotting.height_distribution import hist_height
@@ -28,9 +28,19 @@ if __name__ == '__main__':
     logger.info("Setting config file...")
     config = ConfigParser()
     # Code in the parser objects, hard coded
-    config['Filenames'] = {'HumanData': 'ground_data_2019.csv',
-                           'DroneData': 'point_data_6in_2019obs.csv',
-                           'ObservationKey': 'obs_2019_key.csv'}
+    config['Filenames'] = {
+        'HumanData': 'ground_data_2019.csv',
+        'DroneData': 'point_data_6in_2019obs.csv',
+        'ObservationKey': 'obs_2019_key.csv',
+        'data_07_02': 'MSU_2019_07_02_NatCol_obs_plots.filter.csv',
+        'data_07_15': 'MSU_2019_07_15_NatCol_obs_plots.filter.csv',
+        'data_07_28': 'MSU_2019_07_28_NatCol_obs_plots.filter.csv',
+        'data_08_12': 'MSU_2019_08_12_NatCol_obs_plots.filter.csv',
+        'data_09_02': 'MSU_2019_09_02_NatCol_obs_plots.filter.csv',
+        'data_09_11': 'MSU_2019_09_11_NatCol_obs_plots.filter.csv',
+        'data_09_24': 'MSU_2019_09_24_NatCol_obs_plots.filter.csv',
+        'data_10_07': 'MSU_2019_10_07_NatCol_obs_plots.filter.csv'
+    }
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
 
@@ -39,31 +49,40 @@ if __name__ == '__main__':
     parser.read('config.ini')
     # Set the objects from the parser
     HumanData = parser.get('Filenames', 'HumanData')
-    DroneData = parser.get('Filenames', 'DroneData')
+    data_07_02 = parser.get('Filenames', 'data_07_02')
+    data_07_15 = parser.get('Filenames', 'data_07_15')
+    data_07_28 = parser.get('Filenames', 'data_07_28')
+    data_08_12 = parser.get('Filenames', 'data_08_12')
+    data_09_02 = parser.get('Filenames', 'data_09_02')
+    data_09_11 = parser.get('Filenames', 'data_09_11')
+    data_09_24 = parser.get('Filenames', 'data_09_24')
+    data_10_07 = parser.get('Filenames', 'data_10_07')
+
     ObservationKey = parser.get('Filenames', 'ObservationKey')
     logger.info("Config file objects have been set...")
 
     logger.info("Load and clean the data...")
-    DroneData = image_data(DroneData)
+    soil_data = las_data(data_07_02)
+    canopy_data = las_data(data_09_02)
 
     logger.info('Importing the ground data...')
     HumanData = ground_data(HumanData)
 
     # extract data from columns for soil
-    soil, soil_size = extract_dsm(
-        DroneData,
-        colname="DSM_7_2_19",
-        groupcol="plot_id",
+    soil, soil_size, soil_name = las_extract(
+        soil_data,
+        colname="z_position",
+        groupcol="shpID",
         grouprow=HumanData["plot"].values
     )
 
     hist_height(soil, "soil_hist.png")
 
     # extract data from columns for canopy
-    canopy, canopy_size = extract_dsm(
-        DroneData,
-        colname="DSM_9_2_19",  # this is the last date (caution: dead plants?)
-        groupcol="plot_id",
+    canopy, canopy_size, canopy_name = las_extract(
+        canopy_data,
+        colname="z_position",
+        groupcol="shpID",
         grouprow=HumanData["plot"].values
     )
 
@@ -73,6 +92,9 @@ if __name__ == '__main__':
     manual_ht = extract_canopy_ht(
         HumanData
     )
+
+    print(soil_name)
+    print(canopy_name)
 
     # identify optimal quantile settings
     cost, pos, optimizer = quantile_optimize(
