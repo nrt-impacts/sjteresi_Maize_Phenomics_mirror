@@ -69,7 +69,7 @@ if __name__ == '__main__':
     HumanData = ground_data(HumanData)
 
     # extract data from columns for soil
-    soil, soil_size = las_extract(
+    soil, soil_size, soil_name = las_extract(
         soil_data,
         colname="z_position",
         groupcol="shpID",
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     hist_height(soil, "soil_hist.png")
 
     # extract data from columns for canopy
-    canopy, canopy_size = las_extract(
+    canopy, canopy_size, canopy_name = las_extract(
         canopy_data,
         colname="z_position",
         groupcol="shpID",
@@ -92,6 +92,9 @@ if __name__ == '__main__':
     manual_ht = extract_canopy_ht(
         HumanData
     )
+
+    print(soil_name)
+    print(canopy_name)
 
     # identify optimal quantile settings
     cost, pos, optimizer = quantile_optimize(
