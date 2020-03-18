@@ -1,5 +1,6 @@
 import numpy
 
+
 def get_quantile(q, height, height_size):
     """
     Retrieve a height vector.
@@ -21,15 +22,15 @@ def get_quantile(q, height, height_size):
         An array of heights at the specified quantiles.
     """
     # allocate empty array
-    ht = numpy.empty((len(height_size), len(q)), dtype = 'float64')
+    ht = numpy.empty((len(height_size), len(q)), dtype='float64')
 
     # get start, stop indices
     height_stop = height_size.cumsum()
     height_start = height_stop - height_size
 
     # for each group, get quantile
-    for i,(st,sp) in enumerate(zip(height_start, height_stop)):
-        ht[i,:] = numpy.quantile(height[st:sp], q)
+    for i, (st, sp) in enumerate(zip(height_start, height_stop)):
+        ht[i, :] = numpy.quantile(height[st:sp], q)
 
     # return height
     return ht
@@ -78,12 +79,12 @@ def htcor_objfn(x, z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht):
     """
     # allocate empty arrays for soil height and canopy height.
     soil_ht = numpy.empty(
-        shape = (len(x),len(manual_ht)),
-        dtype = 'float64'
+        shape=(len(x), len(manual_ht)),
+        dtype='float64'
     )
     canopy_ht = numpy.empty(
-        shape = (len(x),len(manual_ht)),
-        dtype = 'float64'
+        shape=(len(x), len(manual_ht)),
+        dtype='float64'
     )
 
     # calculate stop indices for soil, canopy
@@ -91,18 +92,18 @@ def htcor_objfn(x, z_soil, z_soil_size, z_canopy, z_canopy_size, manual_ht):
     canopy_stop = z_canopy_size.cumsum()
 
     # calculate quantile values
-    for i,(st,sp) in enumerate(zip(soil_stop - z_soil_size, soil_stop)):
-        soil_ht[:,i] = numpy.quantile(z_soil[st:sp], x[:,0])
-    for i,(st,sp) in enumerate(zip(canopy_stop - z_canopy_size, canopy_stop)):
-        canopy_ht[:,i] = numpy.quantile(z_canopy[st:sp], x[:,1])
+    for i, (st, sp) in enumerate(zip(soil_stop - z_soil_size, soil_stop)):
+        soil_ht[:, i] = numpy.quantile(z_soil[st:sp], x[:, 0])
+    for i, (st, sp) in enumerate(zip(canopy_stop - z_canopy_size, canopy_stop)):
+        canopy_ht[:, i] = numpy.quantile(z_canopy[st:sp], x[:, 1])
 
     # calculate estimated heights
     est_ht = canopy_ht - soil_ht
 
     # calculate Pearson correlation coefficient
     r = numpy.fromiter(
-        (numpy.corrcoef(est_ht[r,:],manual_ht)[0,1] for r in range(len(est_ht))),
-        dtype = 'float64'
+        (numpy.corrcoef(est_ht[r, :], manual_ht)[0, 1] for r in range(len(est_ht))),
+        dtype='float64'
     )
 
     # return negative Pearson correlation coefficient, since we want to minimize
