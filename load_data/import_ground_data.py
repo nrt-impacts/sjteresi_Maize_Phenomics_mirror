@@ -42,5 +42,7 @@ def extract_canopy_ht(df, colname='MeanPHeight'):
     # extract numpy.ndarray copy
     canopy_ht = df.loc[:, colname].values.copy()
 
+    names = df['plot'].values
+
     # return numpy.ndarray
-    return canopy_ht
+    return canopy_ht, names
