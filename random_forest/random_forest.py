@@ -45,14 +45,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load input data')
     path_main = os.path.abspath(__file__)
 
-    parser.add_argument('human_data', type=str, default=os.path.join(
-                        path_main, '../../', 'data'),
+    parser.add_argument('--human_data', '-g', type=str, default=os.path.join(
+                        path_main, '../../', 'data/ground_data_2019.csv'),
                         help='parent path of human data file')
-    parser.add_argument('drone_data', type=str, default=os.path.join(
-                        path_main, '../../', 'data'),
+    parser.add_argument('--drone_data', '-d', type=str, default=os.path.join(
+                        path_main, '../../', 'data/point_data_6in_2019obs.csv'),
                         help='parent path of drone data file')
-    parser.add_argument('obs_data', type=str,  default=os.path.join(
-                        path_main, '../../', 'data'),
+    parser.add_argument('--obs_data', '-o', type=str,  default=os.path.join(
+                        path_main, '../../', 'data/obs_2019_key.csv'),
                         help='parent path of observation key file')
     parser.add_argument('-v', '--verbose',
                         action='store_true',
