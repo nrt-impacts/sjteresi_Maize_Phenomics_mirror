@@ -14,6 +14,7 @@ import logging
 import coloredlogs
 import os
 import sys
+from sklearn.model_selection import train_test_split
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -109,6 +110,7 @@ if __name__ == '__main__':
     for argname, argval in vars(args).items():
         logger.debug("%-12s: %s" % (argname, argval))
     validate_args(args, logger)
+
     logger.info("Importing")
 
     logger.info('Load the observation key...')
@@ -124,4 +126,23 @@ if __name__ == '__main__':
                                 GenoPlotDict)
     drone_data = verify_drone_replaced_files(args.drone_data, args.replaced_drone,
                                 GenoPlotDict)
+    
+    # One-hot encoding to make genotype binary so it can be input
+    # to the machine learning model.
+    logger.info('Convert Genotype of drone data to numerical...')
+    DroneNumeric = pd.get_dummies(drone_data)
 
+    # Setting up the features and labels
+    logger.info('Formatting labels...')
+    labels = np.array(HumanData_Replaced[['PlantHeightP1', 'PlantHeightP2']])
+    print(labels.shape)
+
+    logger.info('Formatting features...')
+    features = np.array(DroneNumeric)
+    print(features.shape)
+
+    logger.info('Saving feature names...')
+    feature_list = list(DroneNumeric.columns)
+
+    logger.info('Partitioning training and testing data...')
+    #train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=0.25, random_state=42)
