@@ -14,7 +14,10 @@ import logging
 import coloredlogs
 import os
 import sys
+<<<<<<< HEAD
 from sklearn.model_selection import train_test_split
+=======
+>>>>>>> 10cadba260a7f46d18b3154627fd420d0beeb8e0
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
