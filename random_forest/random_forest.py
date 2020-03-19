@@ -41,6 +41,36 @@ def validate_args(args, logger):
         raise ValueError("%s is not a directory" % (args.obs_data))
 
 
+def verify_human_replaced_files(nonreplaced_human_path, replaced_human_path,
+                                replacement_dict):
+    if os.path.exists(replaced_human_path):
+        logger.info('Importing previously name replaced human data from disk...')
+        replaced_human = pd.read_csv(replaced_human_path, header='infer',
+                                     sep='\t')
+    else:
+        logger.info('Previously replaced human data does not exist...')
+        logger.info('Importing unfiltered human data from raw...')
+        human = ground_data(nonreplaced_human_path)
+        replaced_human = replace_names(human,replacement_dict, 'plot')
+        replaced_human.to_csv(replaced_human_path, sep='\t', header=True)
+    return replaced_human
+
+def verify_drone_replaced_files(nonreplaced_drone_path, replaced_drone_path,
+                                replacement_dict):
+    # TODO clean and possibly merge with the other verify function to clear
+    # confusion
+    if os.path.exists(replaced_drone_path):
+        logger.info('Importing previously name replaced drone data from disk...')
+        replaced_drone = pd.read_csv(replaced_drone_path, header='infer',
+                                     sep='\t')
+    else:
+        logger.info('Previously replaced drone data does not exist...')
+        logger.info('Importing unfiltered drone data from raw...')
+        drone = image_data(nonreplaced_drone_path)
+        replaced_drone = replace_names(drone,replacement_dict, 'plot_id')
+        replaced_drone.to_csv(replaced_drone_path, sep='\t', header=True)
+    return replaced_drone
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load input data')
     path_main = os.path.abspath(__file__)
@@ -54,6 +84,14 @@ if __name__ == '__main__':
     parser.add_argument('--obs_data', '-o', type=str,  default=os.path.join(
                         path_main, '../../', 'data/obs_2019_key.csv'),
                         help='parent path of observation key file')
+
+    parser.add_argument('--replaced_human', '-x', type=str,  default=os.path.join(
+                        path_main, '../../', 'data/replaced/replaced_human.tsv'),
+                        help='parent path of replaced human data')
+    parser.add_argument('--replaced_drone', '-z', type=str,  default=os.path.join(
+                        path_main, '../../', 'data/replaced/replaced_drone.tsv'),
+                        help='parent path of genotype replaced drone data')
+
     parser.add_argument('-v', '--verbose',
                         action='store_true',
                         help='set debugging level to DEBUG')
@@ -61,6 +99,8 @@ if __name__ == '__main__':
     args.human_data = os.path.abspath(args.human_data)
     args.drone_data = os.path.abspath(args.drone_data)
     args.obs_data = os.path.abspath(args.obs_data)
+    args.replaced_human = os.path.abspath(args.replaced_human)
+    args.replaced_drone = os.path.abspath(args.replaced_drone)
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logger = logging.getLogger(__name__)
     coloredlogs.install(level=log_level)
@@ -69,15 +109,7 @@ if __name__ == '__main__':
     for argname, argval in vars(args).items():
         logger.debug("%-12s: %s" % (argname, argval))
     validate_args(args, logger)
-
-
-    logger.info("Ready to import")
-
-    logger.info('Load and clean the ground truth data...')
-    human_data = ground_data(args.human_data)
-
-    logger.info('Load and clean the drone data...')
-    drone_data = image_data(args.drone_data)
+    logger.info("Importing")
 
     logger.info('Load the observation key...')
     obs_key = obs_data(args.obs_data)
@@ -85,8 +117,11 @@ if __name__ == '__main__':
     logger.info('Constructing dictionary of genotype vs. plot ID...')
     GenoPlotDict = geno_plot_dict(obs_key)
 
-    logger.info('Replace plot ID with genotype for drone data...')
-    DroneData_Replaced = replace_names(drone_data, GenoPlotDict, 'plot_id')
+    logger.info('Checking for replaced/filtered data')
 
-    logger.info('Replace plot ID with genotype for ground truth data...')
-    HumanData_Replaced = replace_names(human_data, GenoPlotDict, 'plot')
+    logger.info('Load and clean the ground truth data...')
+    human_data = verify_human_replaced_files(args.human_data, args.replaced_human,
+                                GenoPlotDict)
+    drone_data = verify_drone_replaced_files(args.drone_data, args.replaced_drone,
+                                GenoPlotDict)
+
