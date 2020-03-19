@@ -45,15 +45,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load input data')
     path_main = os.path.abspath(__file__)
 
-    parser.add_argument('human_data', type=str,
+    parser.add_argument('human_data', type=str, default=os.path.join(
+                        path_main, '../../', 'data'),
                         help='parent path of human data file')
-    parser.add_argument('drone_data', type=str,
+    parser.add_argument('drone_data', type=str, default=os.path.join(
+                        path_main, '../../', 'data'),
                         help='parent path of drone data file')
-    parser.add_argument('obs_data', type=str,
+    parser.add_argument('obs_data', type=str,  default=os.path.join(
+                        path_main, '../../', 'data'),
                         help='parent path of observation key file')
-    # parser.add_argument('--path_to_data', '-p', type=str, default=os.path.join(
-                        # path_main, '../../', 'data'),
-                        # help='path to data files within git repository directory')
     parser.add_argument('-v', '--verbose',
                         action='store_true',
                         help='set debugging level to DEBUG')
