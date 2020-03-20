@@ -27,6 +27,17 @@ from load_data.import_image_data import image_data, extract_dsm
 from load_data.import_ground_data import ground_data, extract_canopy_ht
 from load_data.replace_names import replace_names
 
+def read_quantile_data(quantile_data_location, replace_names, GenoPlotDict):
+    """
+    TODO add args
+    """
+    quantile_data = pd.read_csv(quantile_data_location, header='infer')
+    quantile_data.drop(columns=['manual_ht'], inplace=True)
+    quantile_data = replace_names(quantile_data, GenoPlotDict, 'plot')
+    quantile_data = quantile_data.loc[:,
+                                      ~quantile_data.columns.str.contains('name')]
+
+    return quantile_data
 
 def validate_args(args, logger):
     """Raise if an input argument is invalid."""
@@ -85,7 +96,9 @@ if __name__ == '__main__':
     parser.add_argument('--obs_data', '-o', type=str,  default=os.path.join(
                         path_main, '../../', 'data/obs_2019_key.csv'),
                         help='parent path of observation key file')
-
+    parser.add_argument('--quantile_data', '-q', type=str,  default=os.path.join(
+                        path_main, '../../', 'data/quantiles.csv'),
+                        help='parent path of quantiles file')
     parser.add_argument('--replaced_human', '-x', type=str,  default=os.path.join(
                         path_main, '../../', 'data/replaced/replaced_human.tsv'),
                         help='parent path of replaced human data')
@@ -100,6 +113,7 @@ if __name__ == '__main__':
     args.human_data = os.path.abspath(args.human_data)
     args.drone_data = os.path.abspath(args.drone_data)
     args.obs_data = os.path.abspath(args.obs_data)
+    args.quantile_data = os.path.abspath(args.quantile_data)
     args.replaced_human = os.path.abspath(args.replaced_human)
     args.replaced_drone = os.path.abspath(args.replaced_drone)
     log_level = logging.DEBUG if args.verbose else logging.INFO
@@ -143,6 +157,12 @@ if __name__ == '__main__':
 
     logger.info('Saving feature names...')
     feature_list = list(DroneNumeric.columns)
+
+    logger.info('Get quantile data')
+    quantile_data = read_quantile_data(args.quantile_data, replace_names,
+                                       GenoPlotDict)
+
+
 
     logger.info('Partitioning training and testing data...')
     #train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=0.25, random_state=42)
