@@ -15,16 +15,14 @@ import coloredlogs
 import os
 import sys
 from sklearn.model_selection import train_test_split
-
+from sklearn.ensemble import RandomForestRegressor
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-# TODO Scott, do we need the extract_dsm and extract_canopy_ht
-# functions that Robert wrote? I'd think we would if we want to
-# run our machine learning on height values.
+
 from load_data.import_obs_data import obs_data, geno_plot_dict
-from load_data.import_image_data import image_data, extract_dsm
-from load_data.import_ground_data import ground_data, extract_canopy_ht
+from load_data.import_image_data import image_data
+from load_data.import_ground_data import ground_data
 from load_data.replace_names import replace_names
 
 def read_quantile_data(quantile_data_location, replace_names, GenoPlotDict):
@@ -141,28 +139,73 @@ if __name__ == '__main__':
     drone_data = verify_drone_replaced_files(args.drone_data, args.replaced_drone,
                                 GenoPlotDict)
     
-    # One-hot encoding to make genotype binary so it can be input
-    # to the machine learning model.
-    logger.info('Convert Genotype of drone data to numerical...')
-    DroneNumeric = pd.get_dummies(drone_data)
-
-    # Setting up the features and labels
-    logger.info('Formatting labels...')
-    labels = np.array(human_data[['PlantHeightP1', 'PlantHeightP2']])
-    print(labels.shape)
-
-    logger.info('Formatting features...')
-    features = np.array(DroneNumeric)
-    print(features.shape)
-
-    logger.info('Saving feature names...')
-    feature_list = list(DroneNumeric.columns)
-
     logger.info('Get quantile data')
     quantile_data = read_quantile_data(args.quantile_data, replace_names,
                                        GenoPlotDict)
+    print(quantile_data.head())
+    print(quantile_data.shape)
 
+    # One-hot encoding to make genotype binary so it can be input
+    # to the machine learning model.
+    logger.info('Convert Genotype of drone data to numerical...')
+    QuantNumeric = pd.get_dummies(quantile_data)
 
+    # Setting up the features and labels
+    logger.info('Manipulating QuantNumeric...')
+    QuantNumeric['MeanHumanHt'] = human_data['MeanPHeight']
+    nullcol = QuantNumeric.columns[QuantNumeric.isnull().any()]
+    print(QuantNumeric.head())
+    rowswherenull = QuantNumeric[QuantNumeric.isnull().any(axis=1)][nullcol].head()
+    print(rowswherenull)
+
+    logger.info('Formatting labels...')
+    labels1 = np.array(human_data['PlantHeightP1'])
+    x = human_data['PlantHeightP1']
+    rowswherenulllabels = x.loc[x.isnull()]
+    print(rowswherenulllabels)
+
+    logger.info('Saving feature names...')
+    feature_list = list(QuantNumeric.columns)
+
+    logger.info('Formatting features...')
+    features = np.array(QuantNumeric)
+    print(features.shape)
 
     logger.info('Partitioning training and testing data...')
-    #train_features, test_features, train_labels, test_labels = train_test_split(features, labels, test_size=0.25, random_state=42)
+    train_features, test_features, train_labels, test_labels = train_test_split(
+            features, labels1, test_size=0.25, random_state=42)
+    print('Training features shape: ', train_features.shape)
+    print('Training labels shape: ', train_labels.shape)
+    print('Testing features shape: ', test_features.shape)
+    print('Testing labels shape: ', test_labels.shape)
+
+    # Establishing a baseline
+    logger.info('Setting baseline predictions...')
+    baseline_preds = test_features[:, feature_list.index('MeanHumanHt')]
+    arraysum = np.sum(baseline_preds)
+    arrayhasnan = np.isnan(arraysum)
+    print(arrayhasnan)
+
+    arraysum1 = np.sum(test_labels)
+    arrayhasnan1 = np.isnan(arraysum1)
+    print(arrayhasnan1)
+
+    logger.info('Calculating mean baseline error...')
+    baseline_errors = abs(baseline_preds - test_labels)
+    print('Mean baseline error: ', round(np.mean(baseline_errors), 2))
+
+    # Run the random forest model
+    logger.info('Instantiating model...')
+    rf = RandomForestRegressor(n_estimators=1000, random_state=42)
+
+    logger.info('Training the model...')
+    rf.fit(train_features, train_labels);
+
+    logger.info('Making predictions on testing data...')
+    predictions = rf.predict(test_features)
+
+    logger.info('Calculating absolute errors...')
+    errors = abs(predictions - test_labels)
+    print('Mean absolute error: ', round(np.mean(errors), 2))
+
+
