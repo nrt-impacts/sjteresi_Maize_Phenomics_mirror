@@ -134,7 +134,7 @@ if __name__ == '__main__':
 
     # Setting up the features and labels
     logger.info('Formatting labels...')
-    labels = np.array(HumanData_Replaced[['PlantHeightP1', 'PlantHeightP2']])
+    labels = np.array(human_data[['PlantHeightP1', 'PlantHeightP2']])
     print(labels.shape)
 
     logger.info('Formatting features...')
