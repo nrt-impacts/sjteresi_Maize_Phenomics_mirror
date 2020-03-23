@@ -16,6 +16,8 @@ import os
 import sys
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
+import pydot
+from sklearn.tree import export_graphviz
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
@@ -103,7 +105,9 @@ if __name__ == '__main__':
     parser.add_argument('--replaced_drone', '-z', type=str,  default=os.path.join(
                         path_main, '../../', 'data/replaced/replaced_drone.tsv'),
                         help='parent path of genotype replaced drone data')
-
+    parser.add_argument('--tree_dot', '-r', type=str, default=os.path.join(
+                        path_main, '../../', 'random_forest/tree.dot'),
+                        help='parent path of single tree visualization')
     parser.add_argument('-v', '--verbose',
                         action='store_true',
                         help='set debugging level to DEBUG')
@@ -114,6 +118,7 @@ if __name__ == '__main__':
     args.quantile_data = os.path.abspath(args.quantile_data)
     args.replaced_human = os.path.abspath(args.replaced_human)
     args.replaced_drone = os.path.abspath(args.replaced_drone)
+    args.tree_dot = os.path.abspath(args.tree_dot)
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logger = logging.getLogger(__name__)
     coloredlogs.install(level=log_level)
@@ -151,18 +156,8 @@ if __name__ == '__main__':
     QuantNumeric = pd.get_dummies(quantile_data)
 
     # Setting up the features and labels
-    logger.info('Manipulating QuantNumeric...')
-    QuantNumeric['MeanHumanHt'] = human_data['MeanPHeight']
-    nullcol = QuantNumeric.columns[QuantNumeric.isnull().any()]
-    print(QuantNumeric.head())
-    rowswherenull = QuantNumeric[QuantNumeric.isnull().any(axis=1)][nullcol].head()
-    print(rowswherenull)
-
     logger.info('Formatting labels...')
-    labels1 = np.array(human_data['PlantHeightP1'])
-    x = human_data['PlantHeightP1']
-    rowswherenulllabels = x.loc[x.isnull()]
-    print(rowswherenulllabels)
+    labels = np.array(human_data['MeanPHeight'])
 
     logger.info('Saving feature names...')
     feature_list = list(QuantNumeric.columns)
@@ -173,32 +168,17 @@ if __name__ == '__main__':
 
     logger.info('Partitioning training and testing data...')
     train_features, test_features, train_labels, test_labels = train_test_split(
-            features, labels1, test_size=0.25, random_state=42)
+            features, labels, test_size=0.25, random_state=42)
     print('Training features shape: ', train_features.shape)
     print('Training labels shape: ', train_labels.shape)
     print('Testing features shape: ', test_features.shape)
     print('Testing labels shape: ', test_labels.shape)
 
-    # Establishing a baseline
-    logger.info('Setting baseline predictions...')
-    baseline_preds = test_features[:, feature_list.index('MeanHumanHt')]
-    arraysum = np.sum(baseline_preds)
-    arrayhasnan = np.isnan(arraysum)
-    print(arrayhasnan)
-
-    arraysum1 = np.sum(test_labels)
-    arrayhasnan1 = np.isnan(arraysum1)
-    print(arrayhasnan1)
-
-    logger.info('Calculating mean baseline error...')
-    baseline_errors = abs(baseline_preds - test_labels)
-    print('Mean baseline error: ', round(np.mean(baseline_errors), 2))
-
     # Run the random forest model
     logger.info('Instantiating model...')
-    rf = RandomForestRegressor(n_estimators=1000, random_state=42)
+    rf = RandomForestRegressor(n_estimators=200, random_state=42)
 
-    logger.info('Training the model...')
+    logger.info('Train the model on training data...')
     rf.fit(train_features, train_labels);
 
     logger.info('Making predictions on testing data...')
@@ -208,4 +188,18 @@ if __name__ == '__main__':
     errors = abs(predictions - test_labels)
     print('Mean absolute error: ', round(np.mean(errors), 2))
 
+    logger.info('Calculating mean absolute percentage error...')
+    mape = 100 * (errors/test_labels)
+    accuracy = 100 - np.mean(mape)
+    print('Accuracy: ', round(accuracy, 2), '%.')
 
+    logger.info('Visualizing a single decision tree...')
+    tree = rf.estimators_[5]
+    # Export image to a .dot file
+    print(args.tree_dot)
+    export_graphviz(tree, out_file = args.tree_dot, feature_names = 
+                    feature_list, rounded = True, precision = 1)
+    # Use dot file to create a graph
+    (graph, ) = pydot.graph_from_dot_file(args.tree_dot)
+    # Write graph to a png file
+    graph.write_png('tree.png')
