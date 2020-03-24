@@ -18,6 +18,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 import pydot
 from sklearn.tree import export_graphviz
+import matplotlib.pyplot as plt
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
@@ -82,6 +83,65 @@ def verify_drone_replaced_files(nonreplaced_drone_path, replaced_drone_path,
         replaced_drone = replace_names(drone,replacement_dict, 'plot_id')
         replaced_drone.to_csv(replaced_drone_path, sep='\t', header=True)
     return replaced_drone
+
+def test_code():
+    # Test Code that does not necessarily work
+    # logger.info('Visualizing a single decision tree...')
+    # tree = rf.estimators_[5]
+    # Export image to a .dot file
+    # export_graphviz(tree, out_file = args.tree_dot, feature_names = 
+                    # feature_list, rounded = True, precision = 1)
+    # Use dot file to create a graph
+    # (graph, ) = pydot.graph_from_dot_file(args.tree_dot)
+    # Write graph to a png file
+    # graph.write_png('tree.png')
+
+
+
+    # Get numerical feature importances
+    importances = list(rf.feature_importances_)
+    # List of tuples with variable and importance
+    feature_importances = [(feature, round(importance, 2)) for feature,
+                           importance in zip(feature_list, importances)]
+    # Sort the feature importances by most important first
+    feature_importances = sorted(feature_importances, key = lambda x: x[1],
+                                 reverse = True)
+    # Print out the feature and importances
+    [print('Variable: {:20} Importance: {}'.format(*pair)) for pair in
+     feature_importances];
+
+
+    # New random forest with only the two most important variables
+    rf_most_important = RandomForestRegressor(n_estimators= 250,
+                                              random_state=42)
+    # Extract the two most important features
+    important_indices = [feature_list.index('data_10_07.0.9946622335380833'),
+                         feature_list.index('data_10_07.1.0')]
+    train_important = train_features[:, important_indices]
+    test_important = test_features[:, important_indices]
+    # Train the random forest
+    rf_most_important.fit(train_important, train_labels)
+    # Make predictions and determine the error
+    predictions = rf_most_important.predict(test_important)
+    errors = abs(predictions - test_labels)
+    # Display the performance metrics
+    print('Mean Absolute Error:', round(np.mean(errors), 2), 'degrees.')
+    mape = np.mean(100 * (errors / test_labels))
+    accuracy = 100 - mape
+    print('Accuracy:', round(accuracy, 2), '%.')
+
+    # Notebooks
+    # Set the style
+    plt.style.use('fivethirtyeight')
+    # list of x locations for plotting
+    x_values = list(range(len(importances)))
+    # Make a bar chart
+    plt.bar(x_values, importances, orientation = 'vertical')
+    # Tick labels for x axis
+    plt.xticks(x_values, feature_list, rotation='vertical')
+    # Axis labels and title
+    plt.ylabel('Importance'); plt.xlabel('Variable'); plt.title('Variable Importances')
+    plt.show()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load input data')
@@ -169,10 +229,10 @@ if __name__ == '__main__':
     logger.info('Partitioning training and testing data...')
     train_features, test_features, train_labels, test_labels = train_test_split(
             features, labels, test_size=0.25, random_state=42)
-    print('Training features shape: ', train_features.shape)
-    print('Training labels shape: ', train_labels.shape)
-    print('Testing features shape: ', test_features.shape)
-    print('Testing labels shape: ', test_labels.shape)
+    # print('Training features shape: ', train_features.shape)
+    # print('Training labels shape: ', train_labels.shape)
+    # print('Testing features shape: ', test_features.shape)
+    # print('Testing labels shape: ', test_labels.shape)
 
     # Run the random forest model
     logger.info('Instantiating model...')
@@ -193,13 +253,7 @@ if __name__ == '__main__':
     accuracy = 100 - np.mean(mape)
     print('Accuracy: ', round(accuracy, 2), '%.')
 
-    logger.info('Visualizing a single decision tree...')
-    tree = rf.estimators_[5]
-    # Export image to a .dot file
-    print(args.tree_dot)
-    export_graphviz(tree, out_file = args.tree_dot, feature_names = 
-                    feature_list, rounded = True, precision = 1)
-    # Use dot file to create a graph
-    (graph, ) = pydot.graph_from_dot_file(args.tree_dot)
-    # Write graph to a png file
-    graph.write_png('tree.png')
+
+
+
+
